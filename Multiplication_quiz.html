@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Multiplication Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 40px;
+    }
+    input {
+      font-size: 20px;
+      width: 100px;
+      text-align: center;
+    }
+    button {
+      font-size: 18px;
+      padding: 8px 18px;
+      margin-top: 12px;
+    }
+    button:disabled {
+      opacity: 0.5;
+    }
+    .feedback {
+      font-size: 22px;
+      margin-top: 15px;
+    }
+    .correct {
+      color: green;
+    }
+    .incorrect {
+      color: red;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>Multiplication Quiz</h1>
+<h2 id="question"></h2>
+<p id="progress"></p>
+
+<input type="number" id="answer" />
+<br>
+<button id="checkBtn" disabled>Check Answer</button>
+
+<div id="feedback" class="feedback"></div>
+
+<script>
+  let num1 = 1
+  let num2 = 1
+  let questionCount = 0
+  let score = 0
+  const totalQuestions = 50
+
+  const questionEl = document.getElementById("question")
+  const progressEl = document.getElementById("progress")
+  const answerEl = document.getElementById("answer")
+  const checkBtn = document.getElementById("checkBtn")
+  const feedbackEl = document.getElementById("feedback")
+
+  answerEl.addEventListener("input", function () {
+    checkBtn.disabled = answerEl.value === ""
+  })
+
+  answerEl.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !checkBtn.disabled) {
+      checkAnswer()
+    }
+  })
+
+  checkBtn.addEventListener("click", checkAnswer)
+
+  function newQuestion() {
+    if (questionCount === totalQuestions) {
+      showResult()
+      return
+    }
+
+    num1 = Math.floor(Math.random() * 11) + 1
+    num2 = Math.floor(Math.random() * 11) + 1
+    questionCount++
+
+    questionEl.innerText = num1 + " x " + num2 + " = ?"
+    progressEl.innerText = "Question " + questionCount + " of " + totalQuestions
+    feedbackEl.innerText = ""
+    answerEl.value = ""
+    checkBtn.disabled = true
+    answerEl.focus()
+  }
+
+  function checkAnswer() {
+    const userAnswer = Number(answerEl.value)
+    const correctAnswer = num1 * num2
+
+    if (userAnswer === correctAnswer) {
+      score++
+      feedbackEl.innerText = "Correct"
+      feedbackEl.className = "feedback correct"
+    } else {
+      feedbackEl.innerText = "Incorrect. Answer is " + correctAnswer
+      feedbackEl.className = "feedback incorrect"
+    }
+
+    setTimeout(newQuestion, 1200)
+  }
+
+  function showResult() {
+    questionEl.innerText = "Quiz Finished"
+    progressEl.innerText = ""
+    feedbackEl.innerText = "Score " + score + " out of " + totalQuestions
+    feedbackEl.className = "feedback"
+    answerEl.style.display = "none"
+    checkBtn.style.display = "none"
+  }
+
+  newQuestion()
+</script>
+
+</body>
+</html>
