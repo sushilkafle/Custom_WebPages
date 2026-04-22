@@ -1,121 +1,344 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Multiplication Quiz</title>
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 40px;
+      font-family: "Comic Sans MS", "Segoe UI", system-ui, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 50%, #f093fb 100%);
+      padding: 20px 16px;
+      color: #222;
     }
-    input {
-      font-size: 20px;
-      width: 100px;
-      text-align: center;
+    .top-bar {
+      max-width: 700px; margin: 0 auto 16px; display: flex;
+      justify-content: space-between; align-items: center; color: #fff;
     }
+    .top-bar a {
+      color: #fff; text-decoration: none; background: rgba(255,255,255,0.2);
+      padding: 8px 14px; border-radius: 999px; font-size: 14px;
+      backdrop-filter: blur(6px);
+    }
+    .top-bar a:hover { background: rgba(255,255,255,0.35); }
+    .card {
+      max-width: 700px; margin: 0 auto; background: #fff;
+      border-radius: 24px; padding: 28px; box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    }
+    h1 { text-align: center; font-size: clamp(26px, 5vw, 34px); margin-bottom: 6px; color: #d63447; }
+    .subtitle { text-align: center; color: #666; font-size: 14px; margin-bottom: 18px; }
+
+    .hud {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+      margin-bottom: 18px;
+    }
+    .hud-item {
+      background: #f8f9fa; border-radius: 12px; padding: 10px 6px;
+      text-align: center; font-size: 13px;
+    }
+    .hud-item .label { color: #888; font-size: 11px; }
+    .hud-item .val { font-size: 18px; font-weight: bold; color: #d63447; }
+
+    .progress-bar {
+      height: 10px; background: #eee; border-radius: 999px;
+      overflow: hidden; margin-bottom: 20px;
+    }
+    .progress-fill {
+      height: 100%; background: linear-gradient(90deg, #ff6b6b, #f093fb);
+      width: 0%; transition: width 0.35s ease;
+    }
+
+    .question {
+      font-size: clamp(40px, 8vw, 64px); text-align: center;
+      margin: 24px 0; font-weight: bold; color: #333;
+    }
+
+    .answer-row {
+      display: flex; gap: 10px; justify-content: center; align-items: center;
+      flex-wrap: wrap;
+    }
+    input[type="number"] {
+      font-size: 28px; width: 140px; text-align: center; padding: 10px;
+      border: 3px solid #ff6b6b; border-radius: 12px; outline: none;
+      -moz-appearance: textfield;
+    }
+    input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+      -webkit-appearance: none; margin: 0;
+    }
+    input:focus { border-color: #d63447; box-shadow: 0 0 0 4px rgba(214,52,71,0.15); }
+
     button {
-      font-size: 18px;
-      padding: 8px 18px;
-      margin-top: 12px;
+      font-size: 18px; padding: 12px 24px; border: none; border-radius: 12px;
+      background: linear-gradient(135deg, #ff6b6b, #d63447); color: #fff;
+      cursor: pointer; font-weight: bold; transition: transform 0.15s, box-shadow 0.2s;
     }
-    button:disabled {
-      opacity: 0.5;
-    }
+    button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(214,52,71,0.4); }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+
     .feedback {
-      font-size: 22px;
-      margin-top: 15px;
+      text-align: center; font-size: 24px; margin-top: 20px;
+      min-height: 40px; font-weight: bold;
     }
-    .correct {
-      color: green;
+    .correct { color: #2ecc71; animation: pop 0.4s ease; }
+    .incorrect { color: #e74c3c; animation: shake 0.4s ease; }
+    @keyframes pop {
+      0% { transform: scale(0.6); } 60% { transform: scale(1.2); } 100% { transform: scale(1); }
     }
-    .incorrect {
-      color: red;
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20% { transform: translateX(-10px); } 40% { transform: translateX(10px); }
+      60% { transform: translateX(-8px); } 80% { transform: translateX(8px); }
     }
+
+    .result {
+      text-align: center; padding: 20px;
+    }
+    .result .trophy { font-size: 80px; }
+    .result .score-big { font-size: 48px; font-weight: bold; color: #d63447; margin: 10px 0; }
+    .result .message { font-size: 18px; color: #555; margin-bottom: 18px; }
+    .result button { margin: 6px; }
+
+    .confetti {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; overflow: hidden; z-index: 999;
+    }
+    .confetti span {
+      position: absolute; width: 10px; height: 10px; top: -10px;
+      animation: fall linear forwards;
+    }
+    @keyframes fall {
+      to { transform: translateY(105vh) rotate(720deg); }
+    }
+
+    .setup label { display: block; margin: 14px 0 6px; font-weight: bold; color: #444; }
+    .setup select, .setup input[type="number"].cfg {
+      width: 100%; padding: 10px; font-size: 16px; border-radius: 10px;
+      border: 2px solid #ddd; outline: none;
+    }
+    .setup select:focus, .setup input.cfg:focus { border-color: #ff6b6b; }
+    .setup .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .hidden { display: none !important; }
   </style>
 </head>
-
 <body>
 
-<h1>Multiplication Quiz</h1>
-<h2 id="question"></h2>
-<p id="progress"></p>
+  <div class="top-bar">
+    <a href="index.html">← Hub</a>
+    <span style="font-size:13px;opacity:0.9">🏆 Best: <span id="bestScore">—</span></span>
+  </div>
 
-<input type="number" id="answer" />
-<br>
-<button id="checkBtn" disabled>Check Answer</button>
+  <div class="card">
+    <h1>✖️ Multiplication Quiz</h1>
+    <p class="subtitle">Answer as many as you can. Build your streak!</p>
 
-<div id="feedback" class="feedback"></div>
+    <!-- Setup screen -->
+    <div id="setup" class="setup">
+      <label>Times tables to practice (max number)</label>
+      <select id="maxFactor">
+        <option value="5">Easy — up to 5</option>
+        <option value="10" selected>Medium — up to 10</option>
+        <option value="12">Hard — up to 12</option>
+      </select>
 
-<script>
-  let num1 = 1
-  let num2 = 1
-  let questionCount = 0
-  let score = 0
-  const totalQuestions = 50
+      <label>How many questions?</label>
+      <select id="totalQ">
+        <option value="10">10 (Quick)</option>
+        <option value="25">25 (Regular)</option>
+        <option value="50" selected>50 (Marathon)</option>
+      </select>
 
-  const questionEl = document.getElementById("question")
-  const progressEl = document.getElementById("progress")
-  const answerEl = document.getElementById("answer")
-  const checkBtn = document.getElementById("checkBtn")
-  const feedbackEl = document.getElementById("feedback")
+      <label><input type="checkbox" id="timerMode" /> Timer mode (10s per question)</label>
 
-  answerEl.addEventListener("input", function () {
-    checkBtn.disabled = answerEl.value === ""
-  })
+      <div style="text-align:center; margin-top:22px">
+        <button id="startBtn">🚀 Start Quiz</button>
+      </div>
+    </div>
 
-  answerEl.addEventListener("keydown", function (e) {
-    if (e.key === "Enter" && !checkBtn.disabled) {
-      checkAnswer()
+    <!-- Quiz screen -->
+    <div id="quiz" class="hidden">
+      <div class="hud">
+        <div class="hud-item"><div class="label">Question</div><div class="val" id="qNum">1</div></div>
+        <div class="hud-item"><div class="label">Score</div><div class="val" id="scoreVal">0</div></div>
+        <div class="hud-item"><div class="label">Streak 🔥</div><div class="val" id="streakVal">0</div></div>
+        <div class="hud-item"><div class="label">Timer ⏱</div><div class="val" id="timerVal">—</div></div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+      <div class="question" id="question">1 × 1 = ?</div>
+      <div class="answer-row">
+        <input type="number" id="answer" inputmode="numeric" autocomplete="off" />
+        <button id="checkBtn" disabled>Check</button>
+      </div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+
+    <!-- Result screen -->
+    <div id="result" class="hidden result">
+      <div class="trophy" id="trophy">🏆</div>
+      <div class="score-big" id="finalScore">0 / 0</div>
+      <div class="message" id="finalMsg"></div>
+      <button id="playAgain">🔁 Play Again</button>
+      <a href="index.html"><button style="background:linear-gradient(135deg,#888,#555)">🏠 Hub</button></a>
+    </div>
+  </div>
+
+  <div class="confetti" id="confetti"></div>
+
+  <script>
+    // ---------- State ----------
+    const STORAGE_KEY = "mult_best";
+    let num1 = 1, num2 = 1;
+    let questionCount = 0, score = 0, streak = 0, bestStreak = 0;
+    let totalQuestions = 50, maxFactor = 10, useTimer = false;
+    let timerId = null, timeLeft = 10;
+
+    const $ = id => document.getElementById(id);
+    const setup = $("setup"), quiz = $("quiz"), result = $("result");
+    const questionEl = $("question"), answerEl = $("answer"), checkBtn = $("checkBtn"), feedbackEl = $("feedback");
+    const qNum = $("qNum"), scoreVal = $("scoreVal"), streakVal = $("streakVal"), timerVal = $("timerVal");
+    const progressFill = $("progressFill");
+    const bestScore = $("bestScore");
+
+    bestScore.innerText = localStorage.getItem(STORAGE_KEY) || "—";
+
+    // ---------- Sound (Web Audio, no external files) ----------
+    let audioCtx = null;
+    function beep(freq, duration = 0.12, type = "sine") {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.type = type; o.frequency.value = freq;
+        g.gain.value = 0.15;
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start();
+        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        o.stop(audioCtx.currentTime + duration);
+      } catch(e) {}
     }
-  })
+    function soundCorrect() { beep(660, 0.1); setTimeout(() => beep(880, 0.15), 90); }
+    function soundWrong() { beep(220, 0.25, "sawtooth"); }
 
-  checkBtn.addEventListener("click", checkAnswer)
-
-  function newQuestion() {
-    if (questionCount === totalQuestions) {
-      showResult()
-      return
+    // ---------- Confetti ----------
+    function confetti() {
+      const host = $("confetti");
+      const colors = ["#ff6b6b","#4ecdc4","#ffa726","#42a5f5","#ab47bc","#66bb6a","#ffeb3b"];
+      for (let i = 0; i < 60; i++) {
+        const s = document.createElement("span");
+        s.style.left = Math.random() * 100 + "vw";
+        s.style.background = colors[i % colors.length];
+        s.style.animationDuration = (1.5 + Math.random() * 1.8) + "s";
+        s.style.transform = `rotate(${Math.random()*360}deg)`;
+        host.appendChild(s);
+        setTimeout(() => s.remove(), 3500);
+      }
     }
 
-    num1 = Math.floor(Math.random() * 11) + 1
-    num2 = Math.floor(Math.random() * 11) + 1
-    questionCount++
+    // ---------- Flow ----------
+    $("startBtn").onclick = () => {
+      maxFactor = parseInt($("maxFactor").value, 10);
+      totalQuestions = parseInt($("totalQ").value, 10);
+      useTimer = $("timerMode").checked;
+      questionCount = 0; score = 0; streak = 0; bestStreak = 0;
+      setup.classList.add("hidden");
+      quiz.classList.remove("hidden");
+      newQuestion();
+    };
 
-    questionEl.innerText = num1 + " x " + num2 + " = ?"
-    progressEl.innerText = "Question " + questionCount + " of " + totalQuestions
-    feedbackEl.innerText = ""
-    answerEl.value = ""
-    checkBtn.disabled = true
-    answerEl.focus()
-  }
+    $("playAgain").onclick = () => {
+      result.classList.add("hidden");
+      setup.classList.remove("hidden");
+    };
 
-  function checkAnswer() {
-    const userAnswer = Number(answerEl.value)
-    const correctAnswer = num1 * num2
+    answerEl.addEventListener("input", () => {
+      checkBtn.disabled = answerEl.value === "";
+    });
+    answerEl.addEventListener("keydown", e => {
+      if (e.key === "Enter" && !checkBtn.disabled) checkAnswer();
+    });
+    checkBtn.addEventListener("click", checkAnswer);
 
-    if (userAnswer === correctAnswer) {
-      score++
-      feedbackEl.innerText = "Correct"
-      feedbackEl.className = "feedback correct"
-    } else {
-      feedbackEl.innerText = "Incorrect. Answer is " + correctAnswer
-      feedbackEl.className = "feedback incorrect"
+    function startTimer() {
+      clearInterval(timerId);
+      if (!useTimer) { timerVal.innerText = "—"; return; }
+      timeLeft = 10;
+      timerVal.innerText = timeLeft + "s";
+      timerId = setInterval(() => {
+        timeLeft--;
+        timerVal.innerText = timeLeft + "s";
+        if (timeLeft <= 0) {
+          clearInterval(timerId);
+          checkAnswer(true);
+        }
+      }, 1000);
     }
 
-    setTimeout(newQuestion, 1200)
-  }
+    function newQuestion() {
+      if (questionCount >= totalQuestions) return showResult();
+      num1 = Math.floor(Math.random() * maxFactor) + 1;
+      num2 = Math.floor(Math.random() * maxFactor) + 1;
+      questionCount++;
+      questionEl.innerText = `${num1} × ${num2} = ?`;
+      qNum.innerText = questionCount;
+      progressFill.style.width = ((questionCount - 1) / totalQuestions * 100) + "%";
+      feedbackEl.innerText = ""; feedbackEl.className = "feedback";
+      answerEl.value = ""; checkBtn.disabled = true; answerEl.focus();
+      startTimer();
+    }
 
-  function showResult() {
-    questionEl.innerText = "Quiz Finished"
-    progressEl.innerText = ""
-    feedbackEl.innerText = "Score " + score + " out of " + totalQuestions
-    feedbackEl.className = "feedback"
-    answerEl.style.display = "none"
-    checkBtn.style.display = "none"
-  }
+    function checkAnswer(timedOut = false) {
+      clearInterval(timerId);
+      const correct = num1 * num2;
+      const user = Number(answerEl.value);
+      const isRight = !timedOut && user === correct;
 
-  newQuestion()
-</script>
+      if (isRight) {
+        score++; streak++; bestStreak = Math.max(bestStreak, streak);
+        const bonus = streak >= 5 ? " 🔥🔥🔥" : streak >= 3 ? " 🔥" : "";
+        feedbackEl.innerText = "✅ Correct!" + bonus;
+        feedbackEl.className = "feedback correct";
+        soundCorrect();
+        if (streak > 0 && streak % 5 === 0) confetti();
+      } else {
+        streak = 0;
+        feedbackEl.innerText = timedOut
+          ? `⏰ Time's up! Answer was ${correct}`
+          : `❌ Oops! ${num1} × ${num2} = ${correct}`;
+        feedbackEl.className = "feedback incorrect";
+        soundWrong();
+      }
 
+      scoreVal.innerText = score;
+      streakVal.innerText = streak;
+      progressFill.style.width = (questionCount / totalQuestions * 100) + "%";
+
+      setTimeout(newQuestion, isRight ? 900 : 1600);
+    }
+
+    function showResult() {
+      quiz.classList.add("hidden");
+      result.classList.remove("hidden");
+
+      const pct = Math.round(score / totalQuestions * 100);
+      let trophy = "🎯", msg = "Keep practicing, you're doing great!";
+      if (pct === 100) { trophy = "🏆"; msg = "PERFECT SCORE! You're a math champion!"; confetti(); }
+      else if (pct >= 90) { trophy = "🥇"; msg = "Amazing! You really know your tables!"; confetti(); }
+      else if (pct >= 75) { trophy = "🥈"; msg = "Great job! Almost there."; }
+      else if (pct >= 50) { trophy = "🥉"; msg = "Nice effort — a little more practice!"; }
+      else { trophy = "💪"; msg = "Don't give up — try again!"; }
+
+      $("trophy").innerText = trophy;
+      $("finalScore").innerText = `${score} / ${totalQuestions}  (${pct}%)`;
+      $("finalMsg").innerText = `${msg}  •  Best streak: ${bestStreak}`;
+
+      // Save best
+      const prev = parseInt(localStorage.getItem(STORAGE_KEY) || "0", 10);
+      if (score > prev) {
+        localStorage.setItem(STORAGE_KEY, score);
+        bestScore.innerText = score;
+      }
+    }
+  </script>
 </body>
 </html>

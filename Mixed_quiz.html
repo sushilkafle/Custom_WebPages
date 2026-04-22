@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3rd Grade Brain Test</title>
+  <link rel="stylesheet" href="quiz-styles.css" />
+  <style>
+    body { --theme-from: #ab47bc; --theme-to: #6a1b9a; --theme-accent: #4a148c; --theme-accent-dark: #311b92; }
+  </style>
+</head>
+<body>
+  <div id="quiz-root"></div>
+  <script src="quiz-core.js"></script>
+  <script>
+    function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+    // Word problem templates
+    const NAMES = ["Aarav", "Maya", "Ethan", "Priya", "Liam", "Sofia", "Noah", "Zara", "Ava", "Arjun"];
+    const ITEMS = ["apples", "stickers", "marbles", "cookies", "pencils", "books", "candies", "crayons"];
+
+    function wordProblem(d) {
+      const style = pick(["add", "sub", "mul", "div", "groups", "compare"]);
+      const name = pick(NAMES);
+      const name2 = pick(NAMES.filter(n => n !== name));
+      const item = pick(ITEMS);
+
+      if (style === "add") {
+        const a = rand(15, 99), b = rand(15, 99);
+        return { prompt: `${name} had ${a} ${item}. ${name2} gave them ${b} more. How many ${item} now?`, answer: a + b };
+      }
+      if (style === "sub") {
+        const a = rand(40, 120), b = rand(5, a - 1);
+        return { prompt: `${name} had ${a} ${item} and gave ${b} to a friend. How many are left?`, answer: a - b };
+      }
+      if (style === "mul") {
+        const bags = rand(2, 9), per = rand(2, 9);
+        return { prompt: `${name} has ${bags} bags with ${per} ${item} in each. How many ${item} total?`, answer: bags * per };
+      }
+      if (style === "div") {
+        const groups = rand(2, 8), per = rand(2, 9);
+        const total = groups * per;
+        return { prompt: `${name} shares ${total} ${item} equally among ${groups} friends. How many does each friend get?`, answer: per };
+      }
+      if (style === "groups") {
+        const rows = rand(3, 8), cols = rand(3, 8);
+        return { prompt: `There are ${rows} rows with ${cols} ${item} in each row. How many ${item} are there?`, answer: rows * cols };
+      }
+      // compare
+      const a = rand(50, 200), diff = rand(10, 80);
+      const b = a - diff;
+      return { prompt: `${name} has ${a} ${item}. ${name2} has ${b}. How many more does ${name} have?`, answer: a - b };
+    }
+
+    function mixedOp(d) {
+      const op = pick(["+", "−", "×", "÷"]);
+      let a, b, ans, prompt;
+      if (op === "+") {
+        if (d === "easy") { a = rand(10, 50); b = rand(10, 50); }
+        else { a = rand(50, 500); b = rand(50, 500); }
+        ans = a + b;
+        prompt = `${a} + ${b} = ?`;
+      } else if (op === "−") {
+        if (d === "easy") { a = rand(20, 60); b = rand(1, a); }
+        else { a = rand(200, 900); b = rand(50, a); }
+        ans = a - b;
+        prompt = `${a} − ${b} = ?`;
+      } else if (op === "×") {
+        const max = d === "easy" ? 6 : d === "medium" ? 10 : 12;
+        a = rand(2, max); b = rand(2, max);
+        ans = a * b;
+        prompt = `${a} × ${b} = ?`;
+      } else {
+        const max = d === "easy" ? 5 : d === "medium" ? 10 : 12;
+        const q = rand(2, max), dv = rand(2, max);
+        a = q * dv; b = dv;
+        ans = q;
+        prompt = `${a} ÷ ${b} = ?`;
+      }
+      return { prompt, answer: ans };
+    }
+
+    QuizCore.start({
+      title: "3rd Grade Brain Test",
+      emoji: "🧠",
+      storageKey: "mixed_best",
+      subtitle: "Mixed operations and word problems — how sharp is that brain?",
+      difficulties: [
+        { label: "Warm-up", value: "easy" },
+        { label: "3rd Grade Level", value: "medium" },
+        { label: "Challenge", value: "hard" }
+      ],
+      makeQuestion(d) {
+        // ~40% word problems, ~60% plain math
+        return Math.random() < 0.4 ? wordProblem(d) : mixedOp(d);
+      }
+    });
+  </script>
+</body>
+</html>
