@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subtraction Quiz</title>
+  <link rel="stylesheet" href="quiz-styles.css" />
+  <style>
+    body { --theme-from: #ffa726; --theme-to: #fb8c00; --theme-accent: #e65100; --theme-accent-dark: #bf360c; }
+  </style>
+</head>
+<body>
+  <div id="quiz-root"></div>
+  <script src="quiz-core.js"></script>
+  <script>
+    function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+    QuizCore.start({
+      title: "Subtraction Quiz",
+      emoji: "➖",
+      storageKey: "sub_best",
+      subtitle: "Mind your borrowing & regrouping!",
+      difficulties: [
+        { label: "Easy — 1 & 2 digit", value: "easy" },
+        { label: "Medium — 2 digit w/ borrow", value: "medium" },
+        { label: "Hard — 3 digit w/ borrow", value: "hard" }
+      ],
+      makeQuestion(d) {
+        let a, b;
+        if (d === "easy") { a = rand(5, 30); b = rand(1, a); }
+        else if (d === "medium") { a = rand(30, 99); b = rand(10, a); }
+        else { a = rand(200, 999); b = rand(100, a); }
+        return { prompt: `${a} − ${b} = ?`, answer: a - b };
+      }
+    });
+  </script>
+</body>
+</html>

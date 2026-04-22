@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Division Quiz</title>
+  <link rel="stylesheet" href="quiz-styles.css" />
+  <style>
+    body { --theme-from: #42a5f5; --theme-to: #1e88e5; --theme-accent: #1565c0; --theme-accent-dark: #0d47a1; }
+  </style>
+</head>
+<body>
+  <div id="quiz-root"></div>
+  <script src="quiz-core.js"></script>
+  <script>
+    function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+    QuizCore.start({
+      title: "Division Quiz",
+      emoji: "➗",
+      storageKey: "div_best",
+      subtitle: "Whole-number division — the opposite of multiplication!",
+      difficulties: [
+        { label: "Easy — divisors up to 5", value: "easy" },
+        { label: "Medium — divisors up to 10", value: "medium" },
+        { label: "Hard — divisors up to 12", value: "hard" }
+      ],
+      makeQuestion(d) {
+        const max = d === "easy" ? 5 : d === "medium" ? 10 : 12;
+        const divisor = rand(1, max);
+        const quotient = rand(1, max);
+        const dividend = divisor * quotient;
+        return { prompt: `${dividend} ÷ ${divisor} = ?`, answer: quotient };
+      }
+    });
+  </script>
+</body>
+</html>

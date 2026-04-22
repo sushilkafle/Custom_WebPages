@@ -1,55 +1,191 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kids Learning Hub</title>
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: Arial, sans-serif;
+      font-family: "Comic Sans MS", "Segoe UI", system-ui, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      background-attachment: fixed;
+      padding: 30px 16px;
+      color: #222;
+    }
+
+    .hero {
       text-align: center;
-      margin-top: 60px;
+      color: #fff;
+      margin-bottom: 36px;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.25);
     }
-    h1 {
-      margin-bottom: 30px;
+
+    .hero h1 {
+      font-size: clamp(32px, 6vw, 54px);
+      letter-spacing: 1px;
     }
-    .menu {
-      display: inline-block;
-      text-align: left;
+
+    .hero p {
+      font-size: clamp(14px, 2.5vw, 18px);
+      margin-top: 8px;
+      opacity: 0.95;
     }
-    .menu a {
-      display: block;
-      font-size: 20px;
-      padding: 12px 20px;
-      margin-bottom: 12px;
+
+    .grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 26px 22px;
       text-decoration: none;
-      border: 2px solid #333;
-      border-radius: 6px;
-      color: #333;
+      color: #222;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      border-top: 6px solid transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
     }
-    .menu a:hover {
-      background-color: #f0f0f0;
+
+    .card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.22);
     }
-    .note {
-      margin-top: 30px;
+
+    .card .emoji {
+      font-size: 56px;
+      margin-bottom: 10px;
+    }
+
+    .card h2 {
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+
+    .card p {
       font-size: 14px;
       color: #555;
     }
+
+    .card .badge {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .c1 { border-top-color: #ff6b6b; } .c1 .badge { background: #ff6b6b; }
+    .c2 { border-top-color: #4ecdc4; } .c2 .badge { background: #4ecdc4; }
+    .c3 { border-top-color: #ffa726; } .c3 .badge { background: #ffa726; }
+    .c4 { border-top-color: #42a5f5; } .c4 .badge { background: #42a5f5; }
+    .c5 { border-top-color: #ab47bc; } .c5 .badge { background: #ab47bc; }
+    .c6 { border-top-color: #66bb6a; } .c6 .badge { background: #66bb6a; }
+
+    .footer {
+      text-align: center;
+      color: #fff;
+      margin-top: 40px;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .stats {
+      max-width: 1100px;
+      margin: 0 auto 28px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      border-radius: 16px;
+      padding: 14px 20px;
+      color: #fff;
+      font-size: 14px;
+      text-align: center;
+    }
   </style>
 </head>
-
 <body>
 
-  <h1>Kids Learning Hub</h1>
-
-  <div class="menu">
-    <a href="Multiplication_quiz.html">Multiplication Quiz</a>
-    <a href="#">Coming Soon. Addition Quiz</a>
-    <a href="#">Coming Soon. Subtraction Quiz</a>
-    <a href="#">Coming Soon. Division Quiz</a>
+  <div class="hero">
+    <h1>🎓 Kids Learning Hub</h1>
+    <p>Fun math quizzes to get ready for 3rd grade!</p>
   </div>
 
-  <div class="note">
-    Choose a quiz to start learning
+  <div class="stats" id="stats">Loading your progress...</div>
+
+  <div class="grid">
+    <a class="card c1" href="Multiplication_quiz.html">
+      <div class="emoji">✖️</div>
+      <h2>Multiplication</h2>
+      <p>Master times tables 1–12</p>
+      <span class="badge">Core Skill</span>
+    </a>
+    <a class="card c2" href="Addition_quiz.html">
+      <div class="emoji">➕</div>
+      <h2>Addition</h2>
+      <p>2 & 3 digit adding with carries</p>
+      <span class="badge">Core Skill</span>
+    </a>
+    <a class="card c3" href="Subtraction_quiz.html">
+      <div class="emoji">➖</div>
+      <h2>Subtraction</h2>
+      <p>Borrow and regroup practice</p>
+      <span class="badge">Core Skill</span>
+    </a>
+    <a class="card c4" href="Division_quiz.html">
+      <div class="emoji">➗</div>
+      <h2>Division</h2>
+      <p>Basic facts up to 144 ÷ 12</p>
+      <span class="badge">Core Skill</span>
+    </a>
+    <a class="card c5" href="Mixed_quiz.html">
+      <div class="emoji">🧠</div>
+      <h2>3rd Grade Brain Test</h2>
+      <p>Mixed operations & word problems</p>
+      <span class="badge">Challenge</span>
+    </a>
+    <a class="card c6" href="Fractions_quiz.html">
+      <div class="emoji">🍕</div>
+      <h2>Fractions & More</h2>
+      <p>Fractions, rounding, place value</p>
+      <span class="badge">Challenge</span>
+    </a>
   </div>
+
+  <div class="footer">Made with ❤️ — keep practicing a little every day!</div>
+
+  <script>
+    // Show best scores from localStorage
+    const keys = [
+      ["mult_best", "Multiplication"],
+      ["add_best", "Addition"],
+      ["sub_best", "Subtraction"],
+      ["div_best", "Division"],
+      ["mixed_best", "Brain Test"],
+      ["frac_best", "Fractions"]
+    ];
+    const parts = keys
+      .map(([k, label]) => {
+        const v = localStorage.getItem(k);
+        return v ? `${label}: ${v}` : null;
+      })
+      .filter(Boolean);
+    document.getElementById("stats").innerText =
+      parts.length === 0
+        ? "🌟 No scores yet — pick a quiz to begin!"
+        : "🏆 Best scores — " + parts.join("  •  ");
+  </script>
 
 </body>
 </html>

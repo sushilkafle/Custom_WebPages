@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Addition Quiz</title>
+  <link rel="stylesheet" href="quiz-styles.css" />
+  <style>
+    body { --theme-from: #4ecdc4; --theme-to: #44a08d; --theme-accent: #2c8a83; --theme-accent-dark: #1f6b66; }
+  </style>
+</head>
+<body>
+  <div id="quiz-root"></div>
+  <script src="quiz-core.js"></script>
+  <script>
+    function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+    QuizCore.start({
+      title: "Addition Quiz",
+      emoji: "➕",
+      storageKey: "add_best",
+      subtitle: "Add 'em up — watch out for the carries!",
+      difficulties: [
+        { label: "Easy — 1 & 2 digit", value: "easy" },
+        { label: "Medium — 2 digit + carries", value: "medium" },
+        { label: "Hard — 3 digit + carries", value: "hard" }
+      ],
+      makeQuestion(d) {
+        let a, b;
+        if (d === "easy") { a = rand(1, 20); b = rand(1, 20); }
+        else if (d === "medium") { a = rand(10, 99); b = rand(10, 99); }
+        else { a = rand(100, 999); b = rand(100, 999); }
+        return { prompt: `${a} + ${b} = ?`, answer: a + b };
+      }
+    });
+  </script>
+</body>
+</html>
