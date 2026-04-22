@@ -22,6 +22,21 @@
       }
       return arr;
     }
+    // Ensure unique choices — pads with extras if dupes drop the count below 4
+    function uniqueChoices(correct, wrongs, extras = () => String(rand(1, 99))) {
+      const seen = new Set([String(correct)]);
+      const out = [String(correct)];
+      for (const w of wrongs) {
+        const s = String(w);
+        if (!seen.has(s)) { seen.add(s); out.push(s); }
+      }
+      let guard = 0;
+      while (out.length < 4 && guard++ < 20) {
+        const s = String(extras());
+        if (!seen.has(s)) { seen.add(s); out.push(s); }
+      }
+      return shuffle(out);
+    }
 
     // --- 3rd-grade "more than arithmetic" problems ---
 
@@ -43,16 +58,18 @@
     function fractionOfShape() {
       // "A pizza is cut into 8 slices. 3 are eaten. What fraction is LEFT?"
       const total = pick([4, 5, 6, 8, 10]);
-      const eaten = rand(1, total - 1);
+      // Avoid eaten === total - eaten (would make duplicate choices)
+      let eaten;
+      do { eaten = rand(1, total - 1); } while (eaten === total - eaten);
+      const correct = `${total - eaten}/${total}`;
       return {
         prompt: `A pizza is cut into ${total} slices. ${eaten} are eaten. What fraction is LEFT?`,
-        answer: `${total - eaten}/${total}`,
-        choices: shuffle([
-          `${total - eaten}/${total}`,
-          `${eaten}/${total}`,
-          `${total}/${total - eaten}`,
-          `${total - eaten}/${eaten}`
-        ])
+        answer: correct,
+        choices: uniqueChoices(
+          correct,
+          [`${eaten}/${total}`, `${total}/${total - eaten}`, `${total - eaten}/${eaten}`],
+          () => `${rand(1, total - 1)}/${total}`
+        )
       };
     }
 
@@ -67,20 +84,24 @@
 
     function placeValue() {
       // "What is the value of the digit X in NNN?"
-      const n = rand(100, 9999);
-      const str = String(n);
+      // Pick a number whose digits are all non-zero to avoid ambiguity and duplicate choices.
+      let n, str;
+      do {
+        n = rand(111, 9999);
+        str = String(n);
+      } while (str.includes("0"));
       const idx = rand(0, str.length - 1);
       const digit = Number(str[idx]);
       const place = Math.pow(10, str.length - 1 - idx);
+      const correct = digit * place;
       return {
         prompt: `What is the VALUE of the digit <b>${digit}</b> in <b>${n}</b>?`,
-        answer: digit * place,
-        choices: shuffle([
-          String(digit * place),
-          String(digit),
-          String(digit * place * 10),
-          String(digit * Math.max(1, place / 10))
-        ])
+        answer: correct,
+        choices: uniqueChoices(
+          correct,
+          [digit, digit * place * 10, digit * Math.max(1, place / 10)],
+          () => digit * Math.pow(10, rand(0, str.length - 1))
+        )
       };
     }
 
@@ -92,16 +113,14 @@
       const endMn = totalMin % 60;
       const fmt = (h, m) => `${h}:${String(m).padStart(2, "0")}`;
       const correct = fmt(endHr, endMn);
-      const wrongs = new Set();
-      while (wrongs.size < 3) {
-        const dh = rand(-1, 2), dm = pick([-15, 0, 15, 30]);
-        const w = fmt(((endHr + dh - 1 + 12) % 12) + 1, (endMn + dm + 60) % 60);
-        if (w !== correct) wrongs.add(w);
-      }
+      const makeWrong = () => {
+        const dh = rand(-1, 2), dm = pick([-15, 15, 30, 45]);
+        return fmt(((endHr + dh - 1 + 12) % 12) + 1, (endMn + dm + 60) % 60);
+      };
       return {
         prompt: `It is ${fmt(hr, mn)}. What time will it be in ${addMin} minutes?`,
         answer: correct,
-        choices: shuffle([correct, ...wrongs])
+        choices: uniqueChoices(correct, [makeWrong(), makeWrong(), makeWrong()], makeWrong)
       };
     }
 
