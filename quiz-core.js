@@ -177,12 +177,12 @@
 
     return `
       <div class="top-bar">
-        <a href="index.html">← Hub</a>
+        <a href="index.html" class="brand">🎓 Kids Learning Hub</a>
         <span style="font-size:13px;opacity:0.9">🏆 Best: <span id="bestScore">—</span></span>
       </div>
 
       <div class="card">
-        <h1>${cfg.emoji} ${cfg.title}</h1>
+        <h1><a href="index.html" class="title-link">${cfg.emoji} ${cfg.title}</a></h1>
         <p class="subtitle">${cfg.subtitle || "Answer as many as you can. Build your streak!"}</p>
 
         <div id="setup" class="setup">
